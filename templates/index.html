@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script>
+    async function sendMessage() {
+      const userMessage = document.getElementById('userInput').value;
+      if (!userMessage) return;
+
+      // Append user message to chat
+      const chat = document.getElementById('chat');
+      const userBubble = document.createElement('div');
+      userBubble.className = 'user-message';
+      userBubble.textContent = userMessage;
+      chat.appendChild(userBubble);
+
+      // Send message to Flask backend
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ message: userMessage })
+      });
+      const data = await response.json();
+
+      // Append AI response to chat
+      const aiBubble = document.createElement('div');
+      aiBubble.className = 'ai-message';
+      aiBubble.textContent = data.response;
+      chat.appendChild(aiBubble);
+
+      // Clear input
+      document.getElementById('userInput').value = '';
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Chatbot</h1>
+    <div id="chat" class="chatbox"></div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your message here..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</body>
+</html>
